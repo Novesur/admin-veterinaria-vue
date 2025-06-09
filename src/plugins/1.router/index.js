@@ -1,4 +1,3 @@
-import { useCookie } from "@/@core/composable/useCookie";
 import { setupLayouts } from "virtual:generated-layouts";
 import { createRouter, createWebHistory } from "vue-router/auto";
 import { setupGuards } from "./guards";
@@ -18,24 +17,31 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
 
   scrollBehavior(to) {},
+
   extendRoutes: (pages) => [
     ...[
       {
         path: "/",
         name: "index",
         redirect: (to) => {
-          return { name: "productos", query: to.query };
+          // TODO: Get type from backend
+          const userData = localStorage.getItem("user");
+          if (!userData) return { name: "login", query: to.query };
+          return { name: "dashboard" };
         },
-      }],
+      },
+    ],
     ...[
       ...pages,
       ...[
         {
-          path: "/productos-lista",
-          name: "productos",
-          component: () => import("@/pages/products.vue"),
-        }     
-    ]].map((route) => recursiveLayouts(route)),
+          path: "/roles-y-permisos",
+          name: "roles-y-permisos",
+          component: () => import("@/pages/roles-permisos.vue"),
+          meta: {},
+        },
+      ],
+    ].map((route) => recursiveLayouts(route)),
   ],
 });
 
